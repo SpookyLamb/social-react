@@ -1,21 +1,28 @@
-import { Link } from "react-router-dom"
+import { useState } from "react"
+import { useContext } from "react"
+import { AuthContext } from "./authContext"
+import { fetchUser } from "./api"
 
-const Title = () => {
-  return (
-    <h1>
-      Hello World!
-    </h1>
-  )
-}
+import Login from "./Login"
+import Feed from "./Feed"
 
 function App() {
-  return (
-    <div className="p-5">
-      <Link to='/about'>About</Link>
-      <Title />
-    </div>
-  )
-}
+  const {auth} = useContext(AuthContext)
+  // const [pageData, setPageData] = useState([<Login />])
 
+  if (auth.accessToken.length > 0) { //existing access token, bring up our book list
+    return (
+      <div className="p-4">
+        <Feed />
+      </div>
+    )
+  } else { //otherwise, invalid access token, bring up the login page by default
+    return (
+      <div className="p-4">
+        <Login />
+      </div>
+    )
+  }
+}
 
 export default App
