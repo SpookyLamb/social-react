@@ -1,13 +1,14 @@
 // Must Have
-    // Authorization
-        // Create account
-        // Login for functionality
+    // Authorization (DONE)
+        // Create account (DONE)
+        // Login for functionality (DONE)
     // Multi-User - include polling for new posts
-    // Text Posts - full CRUD (only for your own posts)
-        // Display author name
-        // Display date posted
-        // Display text content
-    // Read other user posts
+    // Text Posts
+        // Full CRUD, own posts 
+        // Display author name (DONE)
+        // Display date posted (DONE)
+        // Display text content (DONE)
+    // Read other user posts (DONE)
 // Should Have
     // Image Posts - full CRUD (only for your own posts)
     // Deploy to production - Vercel for client (React) and Fly for server (Django)
@@ -32,8 +33,9 @@ import { TextField } from "@mui/material"
 import { Button } from "@mui/material"
 import { IconButton } from "@mui/material"
 
-// import { Send } from "@mui/icons-material"
-// import { Delete } from "@mui/icons-material"
+import { Send } from "@mui/icons-material"
+import { Delete } from "@mui/icons-material"
+import { Edit } from "@mui/icons-material"
 
 import { v4 as uuidv4 } from 'uuid';
 
@@ -41,29 +43,94 @@ import { useContext, useState, useEffect } from "react"
 import { AuthContext } from "./authContext"
 import { getPosts, createTextPost, editTextPost, deleteTextPost } from "./api"
 
+function Buttons() {
+    return (
+        <>
+            <Col className="col-2 text-center">
+            <IconButton aria-label="edit">
+                <Edit />
+            </IconButton>
+            </Col>
+            <Col className="col-2 text-center">
+                <IconButton aria-label="delete">
+                    <Delete />
+                </IconButton>
+            </Col>
+        </>
+    )
+}
 
 function Post(props) {
     const id = props.id
     const author = props.author
     const text = props.text
-    const date = props.date
-    const likes = props.likes
+    const date = props.date //string
+    const likes = props.likes //array
+    const username = props.auth.username
+
+    function formatDate(unDate) {
+        //ex date: "2024-06-04T14:11:37.347933Z"
+        //this is kinda a stupid way to do it, BUT...
+        let array = unDate.split("")
+        let newDate = ""
+
+        for (const char of array) { //cut out the extra fluff
+            let end = false;
+
+            switch (char) {
+                case "T":
+                    newDate += " "
+                    break
+                case ".":
+                    end = true
+                    break
+                default:
+                    newDate += char
+            }
+
+            if (end) {
+                break //end loop
+            }
+        }
+
+        //ex newdate: "2024-06-04 14:11:37"
+
+        return newDate
+    }
+
+    let buttons
+    if (author == username) { //own posts
+        buttons = (
+            <Buttons/>
+        )
+    } else {
+        buttons = (
+            <></>
+        )
+    }
 
     return (
-        <div>
-            <div>
-                {author}
-            </div>
-            <div>
-                {text}
-            </div>
-            <div>
-                {date}
-            </div>
-            <div>
-                {likes}
-            </div>
-        </div>
+        <Container className="border">
+            <Row>
+                <Col className="col-8 px-3 pt-3">
+                    {"@" + author}
+                </Col>
+                {buttons}
+            </Row>
+            <Row>
+                <Col className="fs-2 p-3">
+                    {text}
+                </Col>
+            </Row>
+            <Row className="pb-2">
+                <Col className="col-8">
+                    {formatDate(date)}
+                </Col>
+                <Col className="col-4">
+                    HEART {likes.length}
+                </Col>
+            </Row>
+        </Container>
     )
 }
 
@@ -95,8 +162,10 @@ function Feed() {
                 id={postID}
                 key={uuidv4()}
                 author={post.user}
+                date={post.created_at}
                 text={post.post_text}
                 likes={post.likes}
+                auth={auth}
                 // setPosts={setPosts}
             />
         )
@@ -105,7 +174,9 @@ function Feed() {
     return (
         <div>
             <PostMaker />
-            {postList}
+            <Container id="feed">
+                {postList}
+            </Container>
         </div>
     )
 }

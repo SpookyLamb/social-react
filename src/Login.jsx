@@ -104,7 +104,7 @@ function Login() {
 
     return (
       <Container className="p-5 text-center my-border foreground-box">
-        <h1 className="text-center p-3 pt-1">Chatterboxes</h1>
+        <h1 className="text-center p-3 pt-1">Chatterbox</h1>
         <h2>Login</h2>
         <Col className="p-1">
             <TextField

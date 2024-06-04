@@ -27,6 +27,7 @@ export const getToken = ({ auth, username, password }) => {
     }).then(response => {
         console.log("GET TOKEN RESPONSE: ", response)
         auth.setAccessToken(response.data.access)
+        auth.setUsername(username)
     }).catch(error => console.log("ERROR: ", error))
 }
 
