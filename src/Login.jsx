@@ -18,17 +18,36 @@ function CreateUser() {
     const [lastName, setLastName] = useState('')
 
     const submit = () => {
-      if (password.length < 8) {
-        alert("Your password must be at least 8 characters long!")
-        return
-      }
-  
-      if (password !== passwordConf) {
-        alert("Passwords didn't match! Please try again.")
-        return
-      }
-  
-      createUser({username, password, email, firstName, lastName})
+        if (username.length < 4) {
+            alert("Your username must be at least 4 characters long!")
+        }
+    
+        if (password.length < 8) {
+            alert("Your password must be at least 8 characters long!")
+            return
+        }
+    
+        if (password !== passwordConf) {
+            alert("Passwords didn't match! Please try again.")
+            return
+        }
+
+        if (email.length < 3) {
+            alert("Please enter a valid email address!")
+            return
+        }
+
+        if (firstName.length < 1) {
+            alert("Please enter a first name!")
+            return
+        }
+
+        if (lastName.length < 1) {
+            alert("Please enter a last name!")
+            return
+        }
+    
+        createUser({username, password, email, firstName, lastName})
     }
   
     return (
@@ -56,6 +75,7 @@ function CreateUser() {
             <TextField
                 label="Confirm Password"
                 variant="standard"
+                type='password'
                 value={passwordConf}
                 onChange={(e) => setPasswordConf(e.target.value)}
             />

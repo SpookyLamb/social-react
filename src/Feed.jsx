@@ -2,7 +2,7 @@
     // Authorization (DONE)
         // Create account (DONE)
         // Login for functionality (DONE)
-    // Multi-User - include polling for new posts
+    // Multi-User - poll for new posts (DONE)
     // Text Posts
         // Full CRUD, own posts 
         // Display author name (DONE)
@@ -43,16 +43,19 @@ import { useContext, useState, useEffect } from "react"
 import { AuthContext } from "./authContext"
 import { getPosts, createTextPost, editTextPost, deleteTextPost } from "./api"
 
-function Buttons() {
+function Buttons(props) {
+    const onEdit = props.onEdit
+    const onDelete = props.onDelete
+
     return (
         <>
             <Col className="col-2 text-center">
-            <IconButton aria-label="edit">
+            <IconButton aria-label="edit" onClick={() => {onEdit()}}>
                 <Edit />
             </IconButton>
             </Col>
             <Col className="col-2 text-center">
-                <IconButton aria-label="delete">
+                <IconButton aria-label="delete" onClick={() => {onDelete()}}>
                     <Delete />
                 </IconButton>
             </Col>
@@ -61,12 +64,23 @@ function Buttons() {
 }
 
 function Post(props) {
-    const id = props.id
+    const { auth } = useContext(AuthContext)
+
+    const id = Number(props.id)
     const author = props.author
     const text = props.text
     const date = props.date //string
     const likes = props.likes //array
     const username = props.auth.username
+    const setPosts = props.setPosts
+
+    function onEdit() {
+
+    }
+
+    function onDelete() {
+        deleteTextPost( {auth, id, setPosts} )
+    }
 
     function formatDate(unDate) {
         //ex date: "2024-06-04T14:11:37.347933Z"
@@ -101,9 +115,9 @@ function Post(props) {
     let buttons
     if (author == username) { //own posts
         buttons = (
-            <Buttons/>
+            <Buttons onEdit={onEdit} onDelete={onDelete}/>
         )
-    } else {
+    } else { //other people's posts, no buttons
         buttons = (
             <></>
         )
@@ -135,10 +149,55 @@ function Post(props) {
 }
 
 function PostMaker(props) {
-    return (
-        <div>
+    const auth = props.auth
+    const setPosts = props.setPosts
 
-        </div>
+    const [postContent, setPostContent] = useState("")
+    const [charCount, setCharCount] = useState(0)
+
+    function submit() {
+        createTextPost({auth, postText: postContent, setPosts})
+    }
+
+    return (
+        <Row className="border py-3">
+            <Container>
+                <Row>
+                    <h2>Create A New Post!</h2>
+                </Row>
+                <Row>
+                    <Col className="text-center">
+                        <TextField id="post-field" multiline fullWidth onChange={(e) => {
+                            let text = e.target.value
+
+                            if (text.length < 281) {
+                                setPostContent(text)
+                                setCharCount(text.length)
+                            } else {
+                                e.target.value = postContent
+                            }
+                        }}/>
+                    </Col>
+                </Row>
+                <Row className="py-2">
+                    <Col className="text-start">
+                        {charCount + "/280"}
+                    </Col>
+                    <Col className="text-end">
+                        <Button variant="contained" endIcon={<Send/>} onClick={() => {
+                            submit()
+                            //reset
+                            const postField = document.getElementById("post-field")
+                            postField.value = ""
+                            setPostContent("")
+                            setCharCount(0)
+                        }}>
+                            Send
+                        </Button>
+                    </Col>
+                </Row>
+            </Container>
+        </Row>
     )
 }
 
@@ -146,8 +205,13 @@ function Feed() {
     const { auth } = useContext(AuthContext)
     const [posts, setPosts] = useState({})
 
-    useEffect( () => {
+    function poll() {
         getPosts( {auth, setPosts} )
+    }
+
+    useEffect( () => {
+        poll()
+        setInterval(poll, 10000)
     }, [])
 
     let keys = Object.keys(posts)
@@ -158,23 +222,26 @@ function Feed() {
         let postID = post.id
 
         postList.push(
-            <Post 
-                id={postID}
-                key={uuidv4()}
-                author={post.user}
-                date={post.created_at}
-                text={post.post_text}
-                likes={post.likes}
-                auth={auth}
-                // setPosts={setPosts}
-            />
+            <Row className="py-2" key={uuidv4()}>
+                <Post 
+                    id={postID}
+                    author={post.user}
+                    date={post.created_at}
+                    text={post.post_text}
+                    likes={post.likes}
+                    auth={auth}
+                    setPosts={setPosts}
+                />
+            </Row>
         )
     }
 
+    postList.reverse() //newest posts first
+
     return (
         <div>
-            <PostMaker />
-            <Container id="feed">
+            <Container id="feed" className="feed">
+                <PostMaker auth={auth} setPosts={setPosts}/>
                 {postList}
             </Container>
         </div>

@@ -108,7 +108,7 @@ export const deleteTextPost = ({ auth, id, setPosts }) => {
             id,
         },
     }).then(response => {
-        console.log("DELETE BOOK RESPONSE: ", response.status)
+        console.log("DELETE POST RESPONSE: ", response.status)
         getPosts( {auth, setPosts} )
     }).catch(error => {
         console.log("ERROR: ", error)
