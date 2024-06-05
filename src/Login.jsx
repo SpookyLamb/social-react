@@ -60,65 +60,65 @@ function CreateUser() {
     }
   
     return (
-    <div>
-        <h2>Register</h2>
-        <div>
-        <Col>
-            <TextField
-                label="Username"
-                variant="standard"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-            />
-        </Col>
-        <Col>
-            <TextField
-                label="Password"
-                variant="standard"
-                type='password'
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-            />
-        </Col>
-        <Col>
-            <TextField
-                label="Confirm Password"
-                variant="standard"
-                type='password'
-                value={passwordConf}
-                onChange={(e) => setPasswordConf(e.target.value)}
-            />
-        </Col>
-        <Col>
-            <TextField
-                label="Email"
-                variant="standard"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-            />
-        </Col>
-        <Col>
-            <TextField
-                label="First Name"
-                variant="standard"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-            />
-        </Col>
-        <Col>
-            <TextField
-                label="Last Name"
-                variant="standard"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-            />
-        </Col>
+        <div className="py-2">
+            <h2>Register</h2>
+            <div>
+            <Col>
+                <TextField
+                    label="Username"
+                    variant="standard"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                />
+            </Col>
+            <Col>
+                <TextField
+                    label="Password"
+                    variant="standard"
+                    type='password'
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                />
+            </Col>
+            <Col>
+                <TextField
+                    label="Confirm Password"
+                    variant="standard"
+                    type='password'
+                    value={passwordConf}
+                    onChange={(e) => setPasswordConf(e.target.value)}
+                />
+            </Col>
+            <Col>
+                <TextField
+                    label="Email"
+                    variant="standard"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                />
+            </Col>
+            <Col>
+                <TextField
+                    label="First Name"
+                    variant="standard"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                />
+            </Col>
+            <Col>
+                <TextField
+                    label="Last Name"
+                    variant="standard"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                />
+            </Col>
+            </div>
+    
+            <div className="pt-4">
+            <Button variant="contained" onClick={() => submit()}>Register!</Button>
+            </div>
         </div>
-  
-        <div className="pt-4">
-          <Button variant="contained" onClick={() => submit()}>Register!</Button>
-        </div>
-    </div>
     )
 }
 
@@ -177,7 +177,7 @@ function Login() {
     }
 
     return (
-        <Container className="p-5 text-center my-border foreground-box">
+        <Container className="p-5 text-center border rounded foreground-box">
             <h1 className="text-center p-3 pt-1">Chatterbox</h1>
             <hr className="pb-2" />
             {display}

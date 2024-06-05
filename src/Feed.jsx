@@ -220,7 +220,7 @@ function Post(props) {
     }
 
     return (
-        <Container className="border foreground-box">
+        <Container className="border rounded foreground-box">
             <Row>
                 <Col className="col-8 px-3 pt-3">
                     {"@" + author}
@@ -266,7 +266,7 @@ function PostMaker(props) {
     }
 
     return (
-        <Row className="border py-3 foreground-box">
+        <Row className="border rounded py-3 foreground-box">
             <Container>
                 <Row>
                     <h2>Create A New Post!</h2>
