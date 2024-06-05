@@ -3,16 +3,16 @@
         // Create account (DONE)
         // Login for functionality (DONE)
     // Multi-User - poll for new posts (DONE)
-    // Text Posts
-        // Full CRUD, own posts 
+    // Text Posts (DONE)
+        // Full CRUD, own posts (DONE)
         // Display author name (DONE)
         // Display date posted (DONE)
         // Display text content (DONE)
     // Read other user posts (DONE)
 // Should Have
+    // Ability to "like" another user's post (DONE)
     // Image Posts - full CRUD (only for your own posts)
     // Deploy to production - Vercel for client (React) and Fly for server (Django)
-    // Some sort of interaction with another user’s post (Like/Comment/Share/Repost)
 // Could Have
     // Public facing user profile
     // View user information 
@@ -36,12 +36,14 @@ import { IconButton } from "@mui/material"
 import { Send } from "@mui/icons-material"
 import { Delete } from "@mui/icons-material"
 import { Edit } from "@mui/icons-material"
+import { Favorite } from "@mui/icons-material"
+import { FavoriteBorder } from "@mui/icons-material"
 
 import { v4 as uuidv4 } from 'uuid';
 
 import { useContext, useState, useEffect } from "react"
 import { AuthContext } from "./authContext"
-import { getPosts, createTextPost, editTextPost, deleteTextPost } from "./api"
+import { getPosts, createTextPost, editTextPost, deleteTextPost, likePost } from "./api"
 
 function Buttons(props) {
     const onEdit = props.onEdit
@@ -49,13 +51,11 @@ function Buttons(props) {
 
     return (
         <>
-            <Col className="col-2 text-center">
-            <IconButton aria-label="edit" onClick={() => {onEdit()}}>
-                <Edit />
-            </IconButton>
-            </Col>
-            <Col className="col-2 text-center">
-                <IconButton aria-label="delete" onClick={() => {onDelete()}}>
+            <Col className="col-4 text-end pt-2">
+                <IconButton size="small" aria-label="edit" onClick={() => {onEdit()}}>
+                    <Edit />
+                </IconButton>
+                <IconButton size="small" aria-label="delete" onClick={() => {onDelete()}}>
                     <Delete />
                 </IconButton>
             </Col>
@@ -70,11 +70,18 @@ function Post(props) {
     const author = props.author
     const date = props.date //string
     const likes = props.likes //array
-    const username = props.auth.username
     const setPosts = props.setPosts
+
+    const username = props.auth.username
+    const userID = props.auth.userID
 
     const [editing, setEditing] = useState(false)
     const [text, setText] = useState(props.text)
+    const [userLiked, setUserLiked] = useState(false)
+
+    if (likes.includes(userID) && !userLiked) { //user previously liked the post, not yet liked
+        setUserLiked(true)
+    }
 
     function onEdit() {
         setEditing(!editing)
@@ -82,6 +89,19 @@ function Post(props) {
 
     function onDelete() {
         deleteTextPost( {auth, id, setPosts} )
+    }
+
+    function onLike() {
+        const status = !userLiked
+
+        if (status) {
+            likes.push(userID) //add like
+        } else {
+            likes.splice(likes.indexOf(userID), 1) //remove like
+        }
+
+        setUserLiked(status)
+        likePost( { auth, id, liked: status} )
     }
 
     function formatDate(unDate) {
@@ -143,6 +163,13 @@ function Post(props) {
         content = text
     }
 
+    let likeButton
+    if (userLiked) {
+        likeButton = (<Favorite />)
+    } else {
+        likeButton = (<FavoriteBorder />)
+    }
+
     return (
         <Container className="border">
             <Row>
@@ -160,8 +187,14 @@ function Post(props) {
                 <Col className="col-8">
                     {formatDate(date)}
                 </Col>
-                <Col className="col-4">
-                    HEART {likes.length}
+                <Col className="col-4 text-end">
+                    <IconButton aria-label="delete" size="small" onClick={() => {
+                        onLike()
+                    }}>
+                        {likeButton}
+                        &nbsp;
+                        {likes.length}
+                    </IconButton>
                 </Col>
             </Row>
         </Container>
