@@ -1,3 +1,6 @@
+// Own Goals:
+    // Remember login
+
 // Must Have
     // Authorization (DONE)
         // Create account (DONE)
@@ -11,7 +14,7 @@
     // Read other user posts (DONE)
 // Should Have
     // Ability to "like" another user's post (DONE)
-    // Image Posts - full CRUD (only for your own posts)
+    // Image Posts - full CRUD (only for your own posts) (DONE minus image editing)
     // Deploy to production - Vercel for client (React) and Fly for server (Django)
 // Could Have
     // Public facing user profile
@@ -132,6 +135,37 @@ function Post(props) {
         }
 
         //ex newdate: "2024-06-04 14:11:37"
+        array = newDate.split(" ") //split again, ex: ["2024-06-04", "14:11:37"]
+        
+        let calendar = array[0]
+        let time = array[1]
+        
+        let calendarArray = calendar.split("-") //split AGAIN, ex ["2024", "06", "04"], aka year, month, day
+        let timeArray = time.split(":") //split AGAIN AGAIN, ex: ["14", "11", "37"], aka hours, minutes, seconds
+        
+        let year = calendarArray[0]
+        let month = calendarArray[1]
+        let day = calendarArray[2]
+        
+        let hours = timeArray[0]
+        let minutes = timeArray[1] //we don't care about seconds
+
+        const monthLookup = {
+            "01": "January",
+            "02": "February",
+            "03": "March",
+            "04": "April",
+            "05": "May",
+            "06": "June",
+            "07": "July",
+            "08": "August",
+            "09": "September",
+            "10": "October",
+            "11": "November",
+            "12": "December",
+        }
+
+        newDate = hours + ":" + minutes + " - " + monthLookup[month] + " " + day + ", " + year
 
         return newDate
     }
@@ -177,7 +211,7 @@ function Post(props) {
         imageContent = (
             <Row>
                 <Col>
-                    <Image src={`${baseUrl}${imagePath}`} fluid />
+                    <Image src={`${baseUrl}${imagePath}`} fluid rounded className="p-2" />
                 </Col>
             </Row>
         )
@@ -186,7 +220,7 @@ function Post(props) {
     }
 
     return (
-        <Container className="border">
+        <Container className="border foreground-box">
             <Row>
                 <Col className="col-8 px-3 pt-3">
                     {"@" + author}
@@ -232,7 +266,7 @@ function PostMaker(props) {
     }
 
     return (
-        <Row className="border py-3">
+        <Row className="border py-3 foreground-box">
             <Container>
                 <Row>
                     <h2>Create A New Post!</h2>

@@ -3,6 +3,7 @@ html {
 }
 body {
   height: 100%;
+  background-color: #d8334A;
 }
 #root {
   height: 100%;
@@ -16,4 +17,15 @@ body {
 
 .feed {
   max-width: 800px;
+}
+
+.foreground-box {
+  background-color: ivory;
+}
+
+.vertical-center {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
 }

@@ -8,6 +8,7 @@ import { Button } from "@mui/material"
 import { useContext, useState } from "react"
 import { AuthContext } from "./authContext"
 import { createUser, getToken } from "./api"
+import { Create } from "@mui/icons-material"
 
 function CreateUser() {
     const [username, setUsername] = useState('')
@@ -48,6 +49,14 @@ function CreateUser() {
         }
     
         createUser({username, password, email, firstName, lastName})
+
+        //reset
+        setUsername('')
+        setPassword('')
+        setPasswordConf('')
+        setEmail('')
+        setFirstName('')
+        setLastName('')
     }
   
     return (
@@ -112,8 +121,8 @@ function CreateUser() {
     </div>
     )
 }
-  
-function Login() {
+
+function LoginField() {
     const { auth } = useContext(AuthContext)
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
@@ -123,40 +132,59 @@ function Login() {
     }
 
     return (
-      <Container className="p-5 text-center my-border foreground-box">
-        <h1 className="text-center p-3 pt-1">Chatterbox</h1>
-        <h2>Login</h2>
-        <Col className="p-1">
-            <TextField
-                label="Username"
-                variant="standard"
-                className="loggedin"
-                id="userlogin"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-            />
-        </Col>
-        <Col className="p-1">
-            <TextField
-                label="Password"
-                variant="standard"
-                className="loggedin"
-                id="passwordlogin"
-                type='password'
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-            />
-        </Col>
-  
-        <div className="pt-4">
-            <Button variant="contained" onClick={() => submit()}>Login!</Button>
+        <div className="py-2">
+            <h2>Login</h2>
+            <Col className="p-1">
+                <TextField
+                    label="Username"
+                    variant="standard"
+                    className="loggedin"
+                    id="userlogin"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                />
+            </Col>
+            <Col className="p-1">
+                <TextField
+                    label="Password"
+                    variant="standard"
+                    className="loggedin"
+                    id="passwordlogin"
+                    type='password'
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                />
+            </Col>
+    
+            <div className="pt-4">
+                <Button variant="contained" onClick={() => submit()}>Login!</Button>
+            </div>
         </div>
-  
-        <hr className=""></hr>
-  
-        <CreateUser/>
-  
-      </Container>
+    )
+}
+
+function Login() {
+    const [registering, setRegistering] = useState(false)
+
+    let display
+    let buttonText
+    if (registering) {
+        display = (<CreateUser/>)
+        buttonText = "Have an account?"
+    } else {
+        display = (<LoginField/>)
+        buttonText = "Need an account?"
+    }
+
+    return (
+        <Container className="p-5 text-center my-border foreground-box">
+            <h1 className="text-center p-3 pt-1">Chatterbox</h1>
+            <hr className="pb-2" />
+            {display}
+            <Button variant="text" className="pt-3" onClick={() => {
+                setRegistering(!registering)
+            }}> {buttonText} </Button>
+        </Container>
     )
 }
 
