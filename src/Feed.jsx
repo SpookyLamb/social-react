@@ -28,6 +28,7 @@
 import Container from "react-bootstrap/Container"
 import Row from "react-bootstrap/Row"
 import Col from "react-bootstrap/Col"
+import Image from "react-bootstrap/Image"
 
 import { TextField } from "@mui/material"
 import { Button } from "@mui/material"
@@ -43,7 +44,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { useContext, useState, useEffect } from "react"
 import { AuthContext } from "./authContext"
-import { getPosts, createTextPost, editTextPost, deleteTextPost, likePost } from "./api"
+import { baseUrl, getPosts, createTextPost, editTextPost, deleteTextPost, likePost } from "./api"
 
 function Buttons(props) {
     const onEdit = props.onEdit
@@ -71,6 +72,7 @@ function Post(props) {
     const date = props.date //string
     const likes = props.likes //array
     const setPosts = props.setPosts
+    const imagePath = props.image
 
     const username = props.auth.username
     const userID = props.auth.userID
@@ -170,6 +172,19 @@ function Post(props) {
         likeButton = (<FavoriteBorder />)
     }
 
+    let imageContent
+    if (imagePath) { //valid image
+        imageContent = (
+            <Row>
+                <Col>
+                    <Image src={`${baseUrl}${imagePath}`} fluid />
+                </Col>
+            </Row>
+        )
+    } else { //no image
+        imageContent = (<></>)
+    }
+
     return (
         <Container className="border">
             <Row>
@@ -179,10 +194,13 @@ function Post(props) {
                 {buttons}
             </Row>
             <Row>
-                <Col className="fs-2 p-3">
+                <Col className="fs-3 p-3">
                     {content}
                 </Col>
             </Row>
+            
+            {imageContent}
+
             <Row className="pb-2">
                 <Col className="col-8">
                     {formatDate(date)}
@@ -206,10 +224,11 @@ function PostMaker(props) {
     const setPosts = props.setPosts
 
     const [postContent, setPostContent] = useState("")
+    const [image, setImage] = useState(undefined)
     const [charCount, setCharCount] = useState(0)
 
     function submit() {
-        createTextPost({auth, postText: postContent, setPosts})
+        createTextPost({auth, postText: postContent, image, setPosts})
     }
 
     return (
@@ -247,6 +266,15 @@ function PostMaker(props) {
                         }}>
                             Send
                         </Button>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                        <input
+                            accept='image/*'
+                            type='file'
+                            onChange={e => setImage(e.target.files[0])}
+                        />
                     </Col>
                 </Row>
             </Container>
@@ -287,6 +315,7 @@ function Feed() {
                     author={post.user}
                     date={post.created_at}
                     text={post.post_text}
+                    image={post.image}
                     likes={post.likes}
                     auth={auth}
                     setPosts={setPosts}
