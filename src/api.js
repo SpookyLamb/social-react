@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const baseUrl = 'http://127.0.0.1:8000'
+export const baseUrl = 'http://127.0.0.1:8000'
 
 //user auth
 
@@ -75,15 +75,22 @@ export const getPosts = ({ auth, setPosts }) => {
     })
 }
 
-export const createTextPost = ({ auth, postText, setPosts }) => {
+export const createTextPost = ({ auth, postText, image, setPosts }) => {
+
+    if (!image) { //no image is undefined/false, set to null before being sent over
+        image = null
+    }
+
     axios({
         method: 'post',
         url: `${baseUrl}/create-post/`,
         headers: {
+            'Content-Type': 'multipart/form-data',
             Authorization: `Bearer ${auth.accessToken}`
         },
         data: {
             text: postText,
+            image,
         }
     }).then(response => {
         console.log("CREATE POST RESPONSE: ", response)
