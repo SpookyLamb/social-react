@@ -68,14 +68,16 @@ function Post(props) {
 
     const id = Number(props.id)
     const author = props.author
-    const text = props.text
     const date = props.date //string
     const likes = props.likes //array
     const username = props.auth.username
     const setPosts = props.setPosts
 
-    function onEdit() {
+    const [editing, setEditing] = useState(false)
+    const [text, setText] = useState(props.text)
 
+    function onEdit() {
+        setEditing(!editing)
     }
 
     function onDelete() {
@@ -123,6 +125,24 @@ function Post(props) {
         )
     }
 
+    let content
+    if (editing) {
+        content = (
+            <TextField value={text} multiline fullWidth
+            onChange={(e) => {
+                setText(e.target.value)
+            }}
+            onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                    editTextPost({ auth, id, postText: text, setPosts })
+                }
+            }}
+            />
+        )
+    } else {
+        content = text
+    }
+
     return (
         <Container className="border">
             <Row>
@@ -133,7 +153,7 @@ function Post(props) {
             </Row>
             <Row>
                 <Col className="fs-2 p-3">
-                    {text}
+                    {content}
                 </Col>
             </Row>
             <Row className="pb-2">
@@ -204,13 +224,19 @@ function PostMaker(props) {
 function Feed() {
     const { auth } = useContext(AuthContext)
     const [posts, setPosts] = useState({})
+    let queuedPosts = {}
 
     function poll() {
-        getPosts( {auth, setPosts} )
+
+        function setQPosts(obj) {
+            queuedPosts = obj
+        }
+
+        getPosts( {auth, setPosts: setQPosts} ) //queue the new posts instead of updating them constantly
     }
 
     useEffect( () => {
-        poll()
+        getPosts( {auth, setPosts} )
         setInterval(poll, 10000)
     }, [])
 
