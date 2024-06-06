@@ -1,8 +1,6 @@
 // Own Goals:
-    // Remember login
-        // Logout button
     // Queued posts do something
-    // Add some limit to posts viewed - Lazy Loading?
+    // Add some limit to posts viewed instead of grabbing them all - Lazy Loading?
 
 // Must Have
     // Authorization (DONE)
@@ -50,18 +48,22 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { useContext, useState, useEffect } from "react"
 import { AuthContext } from "./authContext"
-import { baseUrl, getPosts, createTextPost, editTextPost, deleteTextPost, likePost } from "./api"
+import { baseUrl, getPosts, createTextPost, editTextPost, deleteTextPost, likePost, deleteLogin } from "./api"
 
 function FeedHeader() {
+    const { auth } = useContext(AuthContext)
 
     function logout() {
-
+        deleteLogin()
+        auth.setUsername("")
+        auth.setUserID("")
+        auth.setAccessToken("")
     }
 
     return (
-        <Row>
+        <Row className="pb-3">
             <Col className="text-end">
-                <Button variant="outlined" onClick={() => { logout() }} >
+                <Button variant="contained" onClick={() => { logout() }} >
                     Logout
                 </Button>
             </Col>
@@ -383,6 +385,7 @@ function Feed() {
     return (
         <div>
             <Container id="feed" className="feed">
+                <FeedHeader/>
                 <PostMaker auth={auth} setPosts={setPosts}/>
                 {postList}
             </Container>

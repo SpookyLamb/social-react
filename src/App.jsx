@@ -27,7 +27,6 @@ const checkToken = ({ auth, setPageData }) => {
   }).catch(error => {
       console.log("ERROR: ", error)
       setPageData(<Login />)
-      deleteLogin()
   })
 }
 
