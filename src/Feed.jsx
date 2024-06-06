@@ -1,5 +1,4 @@
 // Own Goals:
-    // Queued posts do something
     // Add some limit to posts viewed instead of grabbing them all - Lazy Loading?
 
 // Must Have
@@ -50,8 +49,39 @@ import { useContext, useState, useEffect } from "react"
 import { AuthContext } from "./authContext"
 import { baseUrl, getPosts, createTextPost, editTextPost, deleteTextPost, likePost, deleteLogin } from "./api"
 
-function FeedHeader() {
+function FeedHeader(props) {
     const { auth } = useContext(AuthContext)
+    // const [currentPostCount, setCurrentPostCount] = useState(0)
+    // const [newPostCount, setNewPostCount] = useState(0)
+    
+    // const posts = props.posts
+    const setPosts = props.setPosts
+
+    let queuedPosts = {}
+
+    // useEffect(() => {
+    //     setCurrentPostCount(Object.keys(posts).length)
+    // }, [posts])
+
+    function poll() {
+
+        function setQPosts(obj) {
+            queuedPosts = obj
+        }
+
+        getPosts( {auth, setPosts: setQPosts} ) //queue the new posts instead of updating them constantly
+        // console.log("Polling.")
+        // let qCount = Object.keys(queuedPosts).length
+        // console.log("Queued Count: ", qCount)
+        // console.log("Post Count: ", currentPostCount)
+        // if (qCount > currentPostCount) {
+        //     setNewPostCount(qCount - currentPostCount)
+        // }
+    }
+
+    useEffect( () => {
+        setInterval(poll, 60000) //checks every minute for new posts = 60000
+    }, [])
 
     function logout() {
         deleteLogin()
@@ -60,8 +90,20 @@ function FeedHeader() {
         auth.setAccessToken("")
     }
 
+    function updatePosts() {
+        if (Object.keys(queuedPosts).length > 0) {
+            setPosts(queuedPosts)
+        }
+        //setNewPostCount(0)
+    }
+
     return (
         <Row className="pb-3">
+            <Col className="text-start">
+                <Button variant="contained" onClick={() => { updatePosts() }}>
+                    {"Refresh Feed"}
+                </Button>
+            </Col>
             <Col className="text-end">
                 <Button variant="contained" onClick={() => { logout() }} >
                     Logout
@@ -341,20 +383,9 @@ function PostMaker(props) {
 function Feed() {
     const { auth } = useContext(AuthContext)
     const [posts, setPosts] = useState({})
-    let queuedPosts = {}
-
-    function poll() {
-
-        function setQPosts(obj) {
-            queuedPosts = obj
-        }
-
-        getPosts( {auth, setPosts: setQPosts} ) //queue the new posts instead of updating them constantly
-    }
 
     useEffect( () => {
         getPosts( {auth, setPosts} )
-        setInterval(poll, 60000) //checks every minute for new posts
     }, [])
 
     let keys = Object.keys(posts)
@@ -385,7 +416,7 @@ function Feed() {
     return (
         <div>
             <Container id="feed" className="feed">
-                <FeedHeader/>
+                <FeedHeader setPosts={setPosts} />
                 <PostMaker auth={auth} setPosts={setPosts}/>
                 {postList}
             </Container>
