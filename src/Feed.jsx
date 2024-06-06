@@ -51,32 +51,27 @@ import { baseUrl, getPosts, createTextPost, editTextPost, deleteTextPost, likePo
 
 function FeedHeader(props) {
     const { auth } = useContext(AuthContext)
-    // const [currentPostCount, setCurrentPostCount] = useState(0)
-    // const [newPostCount, setNewPostCount] = useState(0)
-    
-    // const posts = props.posts
+    const [newPostCount, setNewPostCount] = useState(0)
+    const [queuedPosts, setQueuedPosts] = useState({})
+
+    const posts = props.posts
     const setPosts = props.setPosts
 
-    let queuedPosts = {}
+    useEffect( () => {
+        let qCount = Object.keys(queuedPosts).length
+        console.log("Queued Count: ", qCount)
 
-    // useEffect(() => {
-    //     setCurrentPostCount(Object.keys(posts).length)
-    // }, [posts])
+        let pCount = Object.keys(posts).length
+        console.log("Post Count: ", pCount)
+
+        if (qCount > pCount) {
+            setNewPostCount(qCount - pCount)
+        }
+    }, [queuedPosts])
 
     function poll() {
-
-        function setQPosts(obj) {
-            queuedPosts = obj
-        }
-
-        getPosts( {auth, setPosts: setQPosts} ) //queue the new posts instead of updating them constantly
-        // console.log("Polling.")
-        // let qCount = Object.keys(queuedPosts).length
-        // console.log("Queued Count: ", qCount)
-        // console.log("Post Count: ", currentPostCount)
-        // if (qCount > currentPostCount) {
-        //     setNewPostCount(qCount - currentPostCount)
-        // }
+        console.log("Polling.")
+        getPosts( {auth, setPosts: setQueuedPosts} ) //queue the new posts instead of updating them constantly
     }
 
     useEffect( () => {
@@ -93,15 +88,15 @@ function FeedHeader(props) {
     function updatePosts() {
         if (Object.keys(queuedPosts).length > 0) {
             setPosts(queuedPosts)
+            setNewPostCount(0)
         }
-        //setNewPostCount(0)
     }
 
     return (
         <Row className="pb-3">
             <Col className="text-start">
                 <Button variant="contained" onClick={() => { updatePosts() }}>
-                    {"Refresh Feed"}
+                    {newPostCount + " New Posts"}
                 </Button>
             </Col>
             <Col className="text-end">
@@ -416,7 +411,7 @@ function Feed() {
     return (
         <div>
             <Container id="feed" className="feed">
-                <FeedHeader setPosts={setPosts} />
+                <FeedHeader key={uuidv4()} posts={posts} setPosts={setPosts} />
                 <PostMaker auth={auth} setPosts={setPosts}/>
                 {postList}
             </Container>
