@@ -1,7 +1,6 @@
 function Header() {
   return (
     <div>
-      Menu
     </div>
   )
 }

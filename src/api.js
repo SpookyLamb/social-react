@@ -1,6 +1,7 @@
 import axios from 'axios'
 
-const baseUrl = 'http://127.0.0.1:8000'
+//export const baseUrl = 'http://127.0.0.1:8000' //local dev
+export const baseUrl = 'https://chatterbox-django.fly.dev' //production
 
 //user auth
 
@@ -27,6 +28,22 @@ export const getToken = ({ auth, username, password }) => {
     }).then(response => {
         console.log("GET TOKEN RESPONSE: ", response)
         auth.setAccessToken(response.data.access)
+        auth.setUsername(username)
+        getUserID(response.data.access, auth)
+    }).catch(error => console.log("ERROR: ", error))
+}
+
+const getUserID = (accessToken, auth) => {
+    console.log(accessToken)
+    axios({
+        method: 'get',
+        url: `${baseUrl}/user-id/`,
+        headers: {
+            Authorization: `Bearer ${accessToken}`
+        },
+    }).then(response => {
+        console.log("GET USER RESPONSE: ", response)
+        auth.setUserID(response.data.id)
     }).catch(error => console.log("ERROR: ", error))
 }
 
@@ -59,15 +76,22 @@ export const getPosts = ({ auth, setPosts }) => {
     })
 }
 
-export const createTextPost = ({ auth, postText, setPosts }) => {
+export const createTextPost = ({ auth, postText, image, setPosts }) => {
+
+    if (!image) { //no image is undefined/false, set to null before being sent over
+        image = null
+    }
+
     axios({
         method: 'post',
         url: `${baseUrl}/create-post/`,
         headers: {
+            'Content-Type': 'multipart/form-data',
             Authorization: `Bearer ${auth.accessToken}`
         },
         data: {
             text: postText,
+            image,
         }
     }).then(response => {
         console.log("CREATE POST RESPONSE: ", response)
@@ -107,8 +131,28 @@ export const deleteTextPost = ({ auth, id, setPosts }) => {
             id,
         },
     }).then(response => {
-        console.log("DELETE BOOK RESPONSE: ", response.status)
+        console.log("DELETE POST RESPONSE: ", response.status)
         getPosts( {auth, setPosts} )
+    }).catch(error => {
+        console.log("ERROR: ", error)
+    })
+}
+
+// likes
+
+export const likePost = ({ auth, id, liked }) => {
+    axios({
+        method: 'put',
+        url: `${baseUrl}/like-post/`,
+        headers: {
+            Authorization: `Bearer ${auth.accessToken}`
+        },
+        data: {
+            id,
+            liked,
+        },
+    }).then(response => {
+        console.log("LIKED POST RESPONSE: ", response.status)
     }).catch(error => {
         console.log("ERROR: ", error)
     })

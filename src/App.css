@@ -3,13 +3,29 @@ html {
 }
 body {
   height: 100%;
+  background-color: #d8334A;
 }
 #root {
-  display: flex;
   height: 100%;
+  /* display: flex;  
   flex-direction: column;
-  justify-content: center;
+  justify-content: center; */
 }
 #page-content {
   flex-grow: 2;
+}
+
+.feed {
+  max-width: 800px;
+}
+
+.foreground-box {
+  background-color: ivory;
+}
+
+.vertical-center {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
 }
