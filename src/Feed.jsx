@@ -1,5 +1,8 @@
 // Own Goals:
     // Remember login
+        // Logout button
+    // Queued posts do something
+    // Add some limit to posts viewed - Lazy Loading?
 
 // Must Have
     // Authorization (DONE)
@@ -12,10 +15,10 @@
         // Display date posted (DONE)
         // Display text content (DONE)
     // Read other user posts (DONE)
-// Should Have
+// Should Have (DONE)
     // Ability to "like" another user's post (DONE)
     // Image Posts - full CRUD (only for your own posts) (DONE minus image editing)
-    // Deploy to production - Vercel for client (React) and Fly for server (Django)
+    // Deploy to production - Vercel for client (React) and Fly for server (Django) (DONE)
 // Could Have
     // Public facing user profile
     // View user information 
@@ -48,6 +51,23 @@ import { v4 as uuidv4 } from 'uuid';
 import { useContext, useState, useEffect } from "react"
 import { AuthContext } from "./authContext"
 import { baseUrl, getPosts, createTextPost, editTextPost, deleteTextPost, likePost } from "./api"
+
+function FeedHeader() {
+
+    function logout() {
+
+    }
+
+    return (
+        <Row>
+            <Col className="text-end">
+                <Button variant="outlined" onClick={() => { logout() }} >
+                    Logout
+                </Button>
+            </Col>
+        </Row>
+    )
+}
 
 function Buttons(props) {
     const onEdit = props.onEdit
@@ -332,7 +352,7 @@ function Feed() {
 
     useEffect( () => {
         getPosts( {auth, setPosts} )
-        setInterval(poll, 10000)
+        setInterval(poll, 60000) //checks every minute for new posts
     }, [])
 
     let keys = Object.keys(posts)

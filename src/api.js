@@ -3,6 +3,23 @@ import axios from 'axios'
 //export const baseUrl = 'http://127.0.0.1:8000' //local dev
 export const baseUrl = 'https://chatterbox-django.fly.dev' //production
 
+//helper functions
+
+export function saveLogin(authToken, authRefresh, username) {
+    localStorage.setItem("access", authToken)
+    localStorage.setItem("refresh", authRefresh)
+    localStorage.setItem("username", username)
+    console.log("Saved login information.")
+}
+
+export function deleteLogin() {
+    localStorage.removeItem("access")
+    localStorage.removeItem("refresh")
+    localStorage.removeItem("username")
+    localStorage.removeItem("userID")
+    console.log("Deleted old login information.")
+}
+
 //user auth
 
 export const createUser = ({username, password, email, firstName, lastName}) => {
@@ -26,15 +43,14 @@ export const getToken = ({ auth, username, password }) => {
         username,
         password,
     }).then(response => {
-        console.log("GET TOKEN RESPONSE: ", response)
         auth.setAccessToken(response.data.access)
         auth.setUsername(username)
         getUserID(response.data.access, auth)
+        saveLogin(response.data.access, response.data.refresh, username)
     }).catch(error => console.log("ERROR: ", error))
 }
 
 const getUserID = (accessToken, auth) => {
-    console.log(accessToken)
     axios({
         method: 'get',
         url: `${baseUrl}/user-id/`,
@@ -44,6 +60,7 @@ const getUserID = (accessToken, auth) => {
     }).then(response => {
         console.log("GET USER RESPONSE: ", response)
         auth.setUserID(response.data.id)
+        localStorage.setItem("userID", response.data.id)
     }).catch(error => console.log("ERROR: ", error))
 }
 
@@ -69,7 +86,7 @@ export const getPosts = ({ auth, setPosts }) => {
             Authorization: `Bearer ${auth.accessToken}`
         },
     }).then(response => {
-        console.log("FETCH POSTS RESPONSE: ", response)
+        // console.log("FETCH POSTS RESPONSE: ", response)
         setPosts(response.data)
     }).catch(error => {
         console.log("ERROR: ", error)
@@ -94,7 +111,7 @@ export const createTextPost = ({ auth, postText, image, setPosts }) => {
             image,
         }
     }).then(response => {
-        console.log("CREATE POST RESPONSE: ", response)
+        // console.log("CREATE POST RESPONSE: ", response)
         getPosts({ auth, setPosts })
     }).catch(error => {
         console.log("ERROR: ", error)
@@ -113,7 +130,7 @@ export const editTextPost = ({ auth, id, postText, setPosts }) => {
             text: postText,
         }
     }).then(response => {
-        console.log("EDIT POST RESPONSE: ", response)
+        // console.log("EDIT POST RESPONSE: ", response)
         getPosts({ auth, setPosts })
     }).catch(error => {
         console.log("ERROR: ", error)
@@ -131,7 +148,7 @@ export const deleteTextPost = ({ auth, id, setPosts }) => {
             id,
         },
     }).then(response => {
-        console.log("DELETE POST RESPONSE: ", response.status)
+        // console.log("DELETE POST RESPONSE: ", response.status)
         getPosts( {auth, setPosts} )
     }).catch(error => {
         console.log("ERROR: ", error)
