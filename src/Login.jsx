@@ -181,7 +181,7 @@ function Login() {
             <h1 className="text-center p-3 pt-1">Chatterbox</h1>
             <hr className="pb-2" />
             {display}
-            <Button className="mybutton pt-3" variant="text" onClick={() => {
+            <Button className="pt-3" variant="text" onClick={() => {
                 setRegistering(!registering)
             }}> {buttonText} </Button>
         </Container>
