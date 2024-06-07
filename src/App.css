@@ -108,12 +108,12 @@ body {
 /* MUI OVERRIDES */
 
 /* filled buttons */
-.css-sghohy-MuiButtonBase-root-MuiButton-root { 
+.mybutton { 
   background-color: #4f030e !important;
 }
 
 /* icon buttons */
-.css-1pe4mpk-MuiButtonBase-root-MuiIconButton-root {
+.myiconbutton {
   color: #580611 !important;
 }
 

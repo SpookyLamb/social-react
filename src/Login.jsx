@@ -116,7 +116,7 @@ function CreateUser() {
             </div>
     
             <div className="pt-4">
-            <Button variant="contained" onClick={() => submit()}>Register!</Button>
+            <Button className="mybutton" variant="contained" onClick={() => submit()}>Register!</Button>
             </div>
         </div>
     )
@@ -157,7 +157,7 @@ function LoginField() {
             </Col>
     
             <div className="pt-4">
-                <Button variant="contained" onClick={() => submit()}>Login!</Button>
+                <Button className="mybutton" variant="contained" onClick={() => submit()}>Login!</Button>
             </div>
         </div>
     )
@@ -181,7 +181,7 @@ function Login() {
             <h1 className="text-center p-3 pt-1">Chatterbox</h1>
             <hr className="pb-2" />
             {display}
-            <Button variant="text" className="pt-3" onClick={() => {
+            <Button className="mybutton pt-3" variant="text" onClick={() => {
                 setRegistering(!registering)
             }}> {buttonText} </Button>
         </Container>

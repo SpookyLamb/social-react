@@ -91,12 +91,12 @@ function FeedHeader(props) {
     return (
         <Row className="pb-3">
             <Col className="text-start">
-                <Button variant="contained" onClick={() => { updatePosts() }}>
+                <Button className="mybutton" variant="contained" onClick={() => { updatePosts() }}>
                     {newPostCount + " New Posts"}
                 </Button>
             </Col>
             <Col className="text-end">
-                <Button variant="contained" onClick={() => { logout() }} >
+                <Button className="mybutton" variant="contained" onClick={() => { logout() }} >
                     Logout
                 </Button>
             </Col>
@@ -111,10 +111,10 @@ function Buttons(props) {
     return (
         <>
             <Col className="col-4 text-end pt-2">
-                <IconButton size="small" aria-label="edit" onClick={() => {onEdit()}}>
+                <IconButton className="myiconbutton" size="small" aria-label="edit" onClick={() => {onEdit()}}>
                     <Edit />
                 </IconButton>
-                <IconButton size="small" aria-label="delete" onClick={() => {onDelete()}}>
+                <IconButton className="myiconbutton" size="small" aria-label="delete" onClick={() => {onDelete()}}>
                     <Delete />
                 </IconButton>
             </Col>
@@ -243,7 +243,7 @@ function Post(props) {
     let buttons
     if (author == username) { //own posts
         buttons = (
-            <Buttons onEdit={onEdit} onDelete={onDelete}/>
+            <Buttons className="mybutton" onEdit={onEdit} onDelete={onDelete}/>
         )
     } else { //other people's posts, no buttons
         buttons = (
@@ -303,7 +303,7 @@ function Post(props) {
                     {formatDate(date)}
                 </Col>
                 <Col className="col-4 text-end">
-                    <IconButton aria-label="like" size="small" onClick={() => {
+                    <IconButton className="myiconbutton" aria-label="like" size="small" onClick={() => {
                         onLike()
                     }}>
                         {likeButton}
@@ -354,7 +354,7 @@ function PostMaker(props) {
                         {charCount + "/280"}
                     </Col>
                     <Col className="text-end">
-                        <Button variant="contained" endIcon={<Send/>} onClick={() => {
+                        <Button className="mybutton" variant="contained" endIcon={<Send/>} onClick={() => {
                             submit()
                             //reset
                             const postField = document.getElementById("post-field")
