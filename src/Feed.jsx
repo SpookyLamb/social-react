@@ -59,10 +59,7 @@ function FeedHeader(props) {
 
     useEffect( () => {
         let qCount = Object.keys(queuedPosts).length
-        console.log("Queued Count: ", qCount)
-
         let pCount = Object.keys(posts).length
-        console.log("Post Count: ", pCount)
 
         if (qCount > pCount) {
             setNewPostCount(qCount - pCount)
@@ -70,7 +67,6 @@ function FeedHeader(props) {
     }, [queuedPosts])
 
     function poll() {
-        console.log("Polling.")
         getPosts( {auth, setPosts: setQueuedPosts} ) //queue the new posts instead of updating them constantly
     }
 
@@ -270,7 +266,7 @@ function Post(props) {
         imageContent = (
             <Row>
                 <Col>
-                    <Image src={`${baseUrl}${imagePath}`} fluid rounded className="p-2" />
+                    <Image src={`${baseUrl}${imagePath}`} fluid rounded className="p-2 pb-3" />
                 </Col>
             </Row>
         )
@@ -279,9 +275,9 @@ function Post(props) {
     }
 
     return (
-        <Container className="border rounded foreground-box">
+        <Container className="border rounded foreground-box roboto-regular">
             <Row>
-                <Col className="col-8 px-3 pt-3">
+                <Col className="col-8 px-3 pt-3 roboto-regular-italic">
                     {"@" + author}
                 </Col>
                 {buttons}
@@ -295,11 +291,11 @@ function Post(props) {
             {imageContent}
 
             <Row className="pb-2">
-                <Col className="col-8">
+                <Col className="col-8 roboto-light">
                     {formatDate(date)}
                 </Col>
                 <Col className="col-4 text-end">
-                    <IconButton aria-label="delete" size="small" onClick={() => {
+                    <IconButton aria-label="like" size="small" onClick={() => {
                         onLike()
                     }}>
                         {likeButton}
@@ -325,7 +321,7 @@ function PostMaker(props) {
     }
 
     return (
-        <Row className="border rounded py-3 foreground-box">
+        <Row className="border rounded py-3 foreground-box roboto-regular">
             <Container>
                 <Row>
                     <h2>Create A New Post!</h2>
@@ -344,6 +340,7 @@ function PostMaker(props) {
                         }}/>
                     </Col>
                 </Row>
+
                 <Row className="py-2">
                     <Col className="text-start">
                         {charCount + "/280"}
@@ -361,6 +358,7 @@ function PostMaker(props) {
                         </Button>
                     </Col>
                 </Row>
+
                 <Row>
                     <Col>
                         <input
@@ -370,6 +368,7 @@ function PostMaker(props) {
                         />
                     </Col>
                 </Row>
+
             </Container>
         </Row>
     )
