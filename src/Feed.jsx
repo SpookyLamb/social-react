@@ -137,11 +137,26 @@ function Post(props) {
 
     const [editing, setEditing] = useState(false)
     const [text, setText] = useState(props.text)
-    const [userLiked, setUserLiked] = useState(false)
 
-    if (likes.includes(userID) && !userLiked) { //user previously liked the post, not yet liked
-        setUserLiked(true)
-    }
+    //likes
+
+    const [userLiked, setUserLiked] = useState(false)
+    const [likeButton, setLikeButton] = useState(<FavoriteBorder />) //not liked by default
+
+    useEffect(() => { //handles like button visuals
+        if (userLiked) {
+            setLikeButton(<Favorite />)
+        } else {
+            setLikeButton(<FavoriteBorder />)
+        }
+    }, [userLiked])
+
+    useEffect(() => { //check if user previously liked the post
+        if (likes.includes(Number(userID)) && !userLiked) { //APPARENTLY REACT IS DOING THAT STRING CONVERSION SHIT AGAIN 
+            console.log("Liking!")
+            setUserLiked(true)
+        }
+    }, [])
 
     function onEdit() {
         setEditing(!editing)
@@ -252,13 +267,6 @@ function Post(props) {
         )
     } else {
         content = text
-    }
-
-    let likeButton
-    if (userLiked) {
-        likeButton = (<Favorite />)
-    } else {
-        likeButton = (<FavoriteBorder />)
     }
 
     let imageContent
