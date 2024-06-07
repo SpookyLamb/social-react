@@ -59,7 +59,7 @@ const AuthContextProvider = ({children}) => {
     //check our local storage for these items on page load
     const checkAccess = localStorage.getItem("access")
     const checkUsername = localStorage.getItem("username")
-    const checkID = localStorage.getItem("userID")
+    const checkID = Number(localStorage.getItem("userID"))
 
     if (checkAccess && checkUsername && checkID) { //all valid, not undefined
       setAccessToken(checkAccess)

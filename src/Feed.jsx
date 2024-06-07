@@ -152,7 +152,7 @@ function Post(props) {
     }, [userLiked])
 
     useEffect(() => { //check if user previously liked the post
-        if (likes.includes(Number(userID)) && !userLiked) { //APPARENTLY REACT IS DOING THAT STRING CONVERSION SHIT AGAIN 
+        if (likes.includes(userID) && !userLiked) {
             console.log("Liking!")
             setUserLiked(true)
         }
