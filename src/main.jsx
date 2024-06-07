@@ -18,6 +18,7 @@ import Footer from './Footer'
 
 import { AuthContext } from './authContext'
 import { useState } from 'react'
+import { useEffect } from 'react'
 
 function Layout() {
   return (
@@ -53,7 +54,20 @@ const AuthContextProvider = ({children}) => {
   const [accessToken, setAccessToken] = useState([])
   const [username, setUsername] = useState("")
   const [userID, setUserID] = useState(0)
-  
+
+  useEffect(() => {
+    //check our local storage for these items on page load
+    const checkAccess = localStorage.getItem("access")
+    const checkUsername = localStorage.getItem("username")
+    const checkID = Number(localStorage.getItem("userID"))
+
+    if (checkAccess && checkUsername && checkID) { //all valid, not undefined
+      setAccessToken(checkAccess)
+      setUsername(checkUsername)
+      setUserID(checkID)
+    }
+  }, [])
+
   const auth = {
     accessToken: accessToken,
     setAccessToken: setAccessToken,

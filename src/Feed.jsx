@@ -1,5 +1,5 @@
 // Own Goals:
-    // Remember login
+    // Add some limit to posts viewed instead of grabbing them all - Lazy Loading?
 
 // Must Have
     // Authorization (DONE)
@@ -12,10 +12,10 @@
         // Display date posted (DONE)
         // Display text content (DONE)
     // Read other user posts (DONE)
-// Should Have
+// Should Have (DONE)
     // Ability to "like" another user's post (DONE)
     // Image Posts - full CRUD (only for your own posts) (DONE minus image editing)
-    // Deploy to production - Vercel for client (React) and Fly for server (Django)
+    // Deploy to production - Vercel for client (React) and Fly for server (Django) (DONE)
 // Could Have
     // Public facing user profile
     // View user information 
@@ -47,7 +47,62 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { useContext, useState, useEffect } from "react"
 import { AuthContext } from "./authContext"
-import { baseUrl, getPosts, createTextPost, editTextPost, deleteTextPost, likePost } from "./api"
+import { baseUrl, getPosts, createTextPost, editTextPost, deleteTextPost, likePost, deleteLogin } from "./api"
+
+function FeedHeader(props) {
+    const { auth } = useContext(AuthContext)
+    const [newPostCount, setNewPostCount] = useState(0)
+    const [queuedPosts, setQueuedPosts] = useState({})
+
+    const posts = props.posts
+    const setPosts = props.setPosts
+
+    useEffect( () => {
+        let qCount = Object.keys(queuedPosts).length
+        let pCount = Object.keys(posts).length
+
+        if (qCount > pCount) {
+            setNewPostCount(qCount - pCount)
+        }
+    }, [queuedPosts])
+
+    function poll() {
+        getPosts( {auth, setPosts: setQueuedPosts} ) //queue the new posts instead of updating them constantly
+    }
+
+    useEffect( () => {
+        setInterval(poll, 60000) //checks every minute for new posts = 60000
+    }, [])
+
+    function logout() {
+        deleteLogin()
+        auth.setUsername("")
+        auth.setUserID("")
+        auth.setAccessToken("")
+    }
+
+    function updatePosts() {
+        if (Object.keys(queuedPosts).length > 0) {
+            setPosts(queuedPosts)
+            setNewPostCount(0)
+        }
+    }
+
+    return (
+        <Row className="pb-3">
+            <Col className="text-start">
+                <Button variant="contained" onClick={() => { updatePosts() }}>
+                    {newPostCount + " New Posts"}
+                </Button>
+            </Col>
+            <Col className="text-end">
+                <Button variant="contained" onClick={() => { logout() }} >
+                    Logout
+                </Button>
+            </Col>
+        </Row>
+    )
+}
 
 function Buttons(props) {
     const onEdit = props.onEdit
@@ -82,11 +137,26 @@ function Post(props) {
 
     const [editing, setEditing] = useState(false)
     const [text, setText] = useState(props.text)
-    const [userLiked, setUserLiked] = useState(false)
 
-    if (likes.includes(userID) && !userLiked) { //user previously liked the post, not yet liked
-        setUserLiked(true)
-    }
+    //likes
+
+    const [userLiked, setUserLiked] = useState(false)
+    const [likeButton, setLikeButton] = useState(<FavoriteBorder />) //not liked by default
+
+    useEffect(() => { //handles like button visuals
+        if (userLiked) {
+            setLikeButton(<Favorite />)
+        } else {
+            setLikeButton(<FavoriteBorder />)
+        }
+    }, [userLiked])
+
+    useEffect(() => { //check if user previously liked the post
+        if (likes.includes(userID) && !userLiked) {
+            console.log("Liking!")
+            setUserLiked(true)
+        }
+    }, [])
 
     function onEdit() {
         setEditing(!editing)
@@ -199,19 +269,12 @@ function Post(props) {
         content = text
     }
 
-    let likeButton
-    if (userLiked) {
-        likeButton = (<Favorite />)
-    } else {
-        likeButton = (<FavoriteBorder />)
-    }
-
     let imageContent
     if (imagePath) { //valid image
         imageContent = (
             <Row>
                 <Col>
-                    <Image src={`${baseUrl}${imagePath}`} fluid rounded className="p-2" />
+                    <Image src={`${baseUrl}${imagePath}`} fluid rounded className="p-2 pb-3" />
                 </Col>
             </Row>
         )
@@ -220,9 +283,9 @@ function Post(props) {
     }
 
     return (
-        <Container className="border rounded foreground-box">
+        <Container className="border rounded foreground-box roboto-regular">
             <Row>
-                <Col className="col-8 px-3 pt-3">
+                <Col className="col-8 px-3 pt-3 roboto-regular-italic">
                     {"@" + author}
                 </Col>
                 {buttons}
@@ -236,11 +299,11 @@ function Post(props) {
             {imageContent}
 
             <Row className="pb-2">
-                <Col className="col-8">
+                <Col className="col-8 roboto-light">
                     {formatDate(date)}
                 </Col>
                 <Col className="col-4 text-end">
-                    <IconButton aria-label="delete" size="small" onClick={() => {
+                    <IconButton aria-label="like" size="small" onClick={() => {
                         onLike()
                     }}>
                         {likeButton}
@@ -266,7 +329,7 @@ function PostMaker(props) {
     }
 
     return (
-        <Row className="border rounded py-3 foreground-box">
+        <Row className="border rounded py-3 foreground-box roboto-regular">
             <Container>
                 <Row>
                     <h2>Create A New Post!</h2>
@@ -285,6 +348,7 @@ function PostMaker(props) {
                         }}/>
                     </Col>
                 </Row>
+
                 <Row className="py-2">
                     <Col className="text-start">
                         {charCount + "/280"}
@@ -302,6 +366,7 @@ function PostMaker(props) {
                         </Button>
                     </Col>
                 </Row>
+
                 <Row>
                     <Col>
                         <input
@@ -311,6 +376,7 @@ function PostMaker(props) {
                         />
                     </Col>
                 </Row>
+
             </Container>
         </Row>
     )
@@ -319,20 +385,9 @@ function PostMaker(props) {
 function Feed() {
     const { auth } = useContext(AuthContext)
     const [posts, setPosts] = useState({})
-    let queuedPosts = {}
-
-    function poll() {
-
-        function setQPosts(obj) {
-            queuedPosts = obj
-        }
-
-        getPosts( {auth, setPosts: setQPosts} ) //queue the new posts instead of updating them constantly
-    }
 
     useEffect( () => {
         getPosts( {auth, setPosts} )
-        setInterval(poll, 10000)
     }, [])
 
     let keys = Object.keys(posts)
@@ -363,6 +418,7 @@ function Feed() {
     return (
         <div>
             <Container id="feed" className="feed">
+                <FeedHeader key={uuidv4()} posts={posts} setPosts={setPosts} />
                 <PostMaker auth={auth} setPosts={setPosts}/>
                 {postList}
             </Container>
